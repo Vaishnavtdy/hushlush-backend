@@ -8,9 +8,11 @@ import authRoutes from "./routes/auth.routes";
 import attendanceRoutes from "./routes/attendance.routes";
 import adminRoutes from "./routes/admin.routes";
 
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
 const app = express();
 
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

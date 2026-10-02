@@ -42,7 +42,7 @@ export const SESSION_COOKIE_MAX_AGE_MS = SESSION_MAX_AGE_SECONDS * 1000;
  * and localhost:4000 are same-site (SameSite ignores port), so Lax without Secure works over http.
  */
 export function getSessionCookieOptions() {
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
   return {
     httpOnly: true,
     secure: isProduction,
