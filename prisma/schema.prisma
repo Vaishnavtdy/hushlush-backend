@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DEVELOPER
+}
+
+enum AttendanceStatus {
+  NOT_STARTED
+  CLOCKED_IN
+  ON_BREAK
+  CLOCKED_OUT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  department   String?
+  location     String?
+  employeeId   String   @unique
+  avatar       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  attendances Attendance[]
+
+  @@index([role])
+}
+
+model Attendance {
+  id                String           @id @default(cuid())
+  userId            String
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendanceDate    DateTime         @db.Date
+  clockIn           DateTime?
+  clockOut          DateTime?
+  status            AttendanceStatus @default(NOT_STARTED)
+  totalBreakSeconds Int              @default(0)
+  totalWorkSeconds  Int              @default(0)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  breaks Break[]
+
+  @@unique([userId, attendanceDate])
+  @@index([attendanceDate])
+  @@index([status])
+}
+
+model Break {
+  id              String     @id @default(cuid())
+  attendanceId    String
+  attendance      Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  startedAt       DateTime
+  endedAt         DateTime?
+  durationSeconds Int?
+  createdAt       DateTime   @default(now())
+
+  @@index([attendanceId])
+}
